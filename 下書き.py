@@ -1,78 +1,70 @@
-#工事
-#N週間続く　2
-#13:00時始まり 1h 30m 続く
-#終了14:30
+H, W, D = map(int, input().split())
 
-#n = int(input())
-#t,h,m = input().split()
-#times = [list(map(int, input().split())) for _ in range(n)]
-n = 2
-#t = "13:30"
-#h = "1"
-#m = "30"
-#time=[["15:30","1","30"],["23:20","1","0"]]
-for i in range(n):
-    t,h,m = input().split()
-    t=time[i][0]
-    h=time[i][1]
-    
-    t_h,t_m = t.split(sep=":")
-    u_min = int(t_m) + int(m)
-    
-    #min
-    flag = False
-    if u_min >= 60:
-        flag = True
-        overflow = u_min - 60
-        t_h = int(t_h)+1
-        t_m = overflow
-    
-    #hour
-    t_h = int(t_h)+int(h)
-    if t_h > 23:
-        t_h = 0
-    
-    end_h,end_m = t_h,t_m
-    h_digits = len(str(end_h))
-    m_digits = len(str(end_m))
-    
-    if h_digits <= 1:
-        end_h = str(f'0{end_h}')
-    if m_digits <= 1:
-        end_m = str(f'0{end_m}')
-    
-    print(f'{end_h}:{end_m}')
-#-------------------------------------------------------------:w
-n = int(input())
+# マップの初期化
+grid = [[0 for _ in range(W)] for _ in range(H)]
 
+def is_valid(y, x):
+    return 0 <= y < H and 0 <= x < W
 
-for i in range(n):
-    t,h,m = input().split()
-    t_h,t_m = t.split(sep=":")
-    u_min = int(t_m) + int(m)
+def fill_right_up():  # D = 1
+    num = 1
+    # 左上から右下への対角線を順番に処理
+    for sum_idx in range(H + W - 1):
+        # 各対角線上のマスを上から下に処理
+        y_start = min(sum_idx, H - 1)
+        x_start = max(0, sum_idx - H + 1)
+        
+        y = y_start
+        x = x_start
+        while y >= 0 and x < W:
+            if is_valid(y, x):
+                grid[y][x] = num
+                num += 1
+            y -= 1
+            x += 1
 
-    #min
-    flag = False
-    if u_min >= 60:
-        flag = True
-        overflow = u_min - 60
-        t_h = int(t_h)+1
-        t_m = overflow
-    
-    #hour
-    t_h = int(t_h)+int(h)
-    if t_h > 23:
-        t_h = 0
-    
-    end_h,end_m = t_h,t_m
-    h_digits = len(str(end_h))
-    m_digits = len(str(end_m))
-    
-    if h_digits <= 1:
-        end_h = str(f'0{end_h}')
-    if m_digits <= 1:
-        end_m = str(f'0{end_m}')
-    if flag == False:
-        end_m = u_min
-    
-    print(f'{end_h}:{end_m}')
+def fill_right():  # D = 2
+    num = 1
+    for y in range(H):
+        for x in range(W):
+            grid[y][x] = num
+            num += 1
+
+def fill_down():  # D = 3
+    num = 1
+    for x in range(W):
+        for y in range(H):
+            grid[y][x] = num
+            num += 1
+
+def fill_left_down():  # D = 4
+    num = 1
+    # 左上から右下への対角線を順番に処理
+    for sum_idx in range(H + W - 1):
+        # 各対角線上のマスを左から右に処理
+        y_start = max(0, sum_idx - W + 1)
+        x_start = min(sum_idx, W - 1)
+        
+        y = y_start
+        x = x_start
+        while y < H and x >= 0:
+            if is_valid(y, x):
+                grid[y][x] = num
+                num += 1
+            y += 1
+            x -= 1
+
+# 方向に応じて埋め方を変える
+if D == 1:
+    fill_right_up()
+elif D == 2:
+    fill_right()
+elif D == 3:
+    fill_down()
+elif D == 4:
+    fill_left_down()
+
+# 結果の出力
+for row in grid:
+    print(*row)
+
